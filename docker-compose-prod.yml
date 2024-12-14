@@ -1,0 +1,60 @@
+
+services:
+
+  db:
+    image: mysql:5.7
+    container_name: mysql_container-prod-1
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: myapp_db
+      MYSQL_USER: myuser   #utilisateur generique
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./BDD/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+    healthcheck:  #Attendre que la bdd soit bien init avant d'y acceder
+      test: ["CMD", "mysqladmin", "-u", "root", "-ppassword", "ping"]
+      interval: 2s
+      retries: 5
+      timeout: 3s
+
+#pour le pointage de nginx default.conf, je laisse le nom test, mais c'est bien pour la prod ; 
+  backend_test: 
+    image: radttal/video_backend:latest
+    container_name: projet-backend-prod
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    depends_on:
+      db :
+      # ne démarrera pas tant que la bdd est pas prete
+      # peut etre redondant il y a aussi la véfirication dans l'app du backend
+        condition : service_healthy 
+    volumes: 
+      - videos_volume:/app/videos   
+
+
+  frontend_prod: #integre nginx
+    image: radttal/video_frontend:latest
+    container_name: projet-frontend-prod
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - backend_test #je laisse 'test' pour le default.conf de nginx , sinon c'est bien la version test
+
+
+networks:
+  app-network:
+    driver : bridge
+
+
+
+volumes: #pour la persistance
+  videos_volume:

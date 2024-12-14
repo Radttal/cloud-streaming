@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: radttal/video_backend:v4
+          imagePullPolicy: Never  # ESSAIE DE PULL L"IMAGE LOCAL, il veux pas pull depuis le web ; meme avec ça il n'a pas été content 
+          ports:
+            - containerPort: 5000
+          resources:  #peut  etre que les bugs sont dues au manque de puissance, je les augmentes ici
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+          env:
+            - name: MYSQL_HOST
+              value: "db"
+            - name: MYSQL_USER
+              value: "myuser"
+            - name: MYSQL_PASSWORD
+              value: "password"
+            - name: MYSQL_DATABASE
+              value: "myapp_db"
+          volumeMounts:
+            - name: videos-volume
+              mountPath: /app/videos
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:  #pour avoir des infos et des logs de debbug
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      volumes:
+        - name: videos-volume
+          persistentVolumeClaim:
+            claimName: videos-pvc

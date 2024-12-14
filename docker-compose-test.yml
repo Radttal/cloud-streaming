@@ -1,0 +1,73 @@
+
+services:
+
+  db:
+    image: mysql:5.7
+    container_name: mysql_container-test-1
+    restart: always
+    environment: #connection generique
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: myapp_db
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./BDD/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+    healthcheck:  #Attendre que la bdd soit bien init avant d'y acceder
+      test: ["CMD", "mysqladmin", "-u", "root", "-ppassword", "ping"]
+      interval: 2s
+      retries: 5
+      timeout: 3s
+
+
+  prometheus: #service de monitoring pour avoir des infos de consomation du contenaire
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+
+
+  backend_test:
+    build:
+      context: ./backend_test
+    container_name: projet-backend-test-1
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    depends_on:
+      db :
+        condition : service_healthy # ne démarrera pas tant que la bdd est pas ok
+    volumes: 
+      - videos_volume:/app/videos   
+    image: radttal/video_backend:dev
+
+
+  frontend_test: #integre dirrectement nginx; j'ai tester avec un autre conteneur nginx a part mais j'ai fini par utiliser comme ça, il y avais moins de bug étrange
+    build:
+      context: ./frontend_test
+    container_name: projet-frontend-test-1
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - backend_test
+    image: radttal/video_frontend:dev
+
+
+
+networks:
+  app-network:
+    driver : bridge
+
+
+
+volumes: #pour la persistance
+  videos_volume:
