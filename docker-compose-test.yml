@@ -38,7 +38,7 @@ services:
       context: ./backend_test
     container_name: projet-backend-test-1
     ports:
-      - "5000:5000"
+      - "8080:8080"
     networks:
       - app-network
     depends_on:
