@@ -124,6 +124,6 @@ app.get('/health', (req, res) => {
 app.use('/api/videos', express.static(path.join(__dirname, '../videos')));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
 });
