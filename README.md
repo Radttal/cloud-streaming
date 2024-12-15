@@ -35,6 +35,12 @@ Pour exécuter ce projet, les outils suivants doivent être installés :
 
 Voici une description des scripts inclus dans ce projet, leurs objectifs et instructions pour les utiliser. Des vidéos sont disponible dans backend_test/vidéos si vous n'avez pas de mp4.
 
+**Avant utilisation des scripts, assurez-vous de leur donner les permissions nécessaires en exécutant :**
+
+```bash
+chmod +x script_dev.sh script_prod.sh script_stop.sh supprimer_tout_le_projet.sh
+```
+
 ### 1. **script_dev.sh**
 
 - **Objectif :** Automatiser le démarrage du projet en mode développement.
