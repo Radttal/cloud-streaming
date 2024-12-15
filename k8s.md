@@ -1,4 +1,4 @@
-# Retrace des Étapes d’Intégration Kubernetes pour le Projet Cloud-Streaming
+# Trace des étapes d’intégration Kubernetes pour le projet
 
 ## Contexte
 Ce document présente un retour d’expérience sur l’intégration de Kubernetes dans le projet de plateforme de streaming vidéo. Il inclut les étapes effectuées, les décisions prises, les succès obtenus ainsi que les problèmes rencontrés.
