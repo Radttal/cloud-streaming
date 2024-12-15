@@ -19,7 +19,8 @@ services:
     healthcheck:  #Attendre que la bdd soit bien init avant d'y acceder
       test: ["CMD", "mysqladmin", "-u", "root", "-ppassword", "ping"]
       interval: 2s
-      retries: 5
+      start_period: 30s
+      retries: 10
       timeout: 3s
 
 
@@ -45,7 +46,7 @@ services:
       db :
         condition : service_healthy # ne démarrera pas tant que la bdd est pas ok
     volumes: 
-      - videos_volume:/app/videos   
+      - videos_volume_dev:/app/videos   
     image: radttal/video_backend:dev
 
 
@@ -70,4 +71,4 @@ networks:
 
 
 volumes: #pour la persistance
-  videos_volume:
+  videos_volume_dev:
