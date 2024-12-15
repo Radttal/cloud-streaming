@@ -19,8 +19,18 @@ services:
     healthcheck:  #Attendre que la bdd soit bien init avant d'y acceder
       test: ["CMD", "mysqladmin", "-u", "root", "-ppassword", "ping"]
       interval: 2s
+      start_period: 30s
       retries: 5
       timeout: 3s
+
+  prometheus: #service de monitoring pour avoir des infos de consomation du contenaire
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
 
 #pour le pointage de nginx default.conf, je laisse le nom test, mais c'est bien pour la prod ; 
   backend_test: 
@@ -36,16 +46,18 @@ services:
       # peut etre redondant il y a aussi la véfirication dans l'app du backend
         condition : service_healthy 
     volumes: 
-      - videos_volume:/app/videos   
+      - videos_volume_prod:/app/videos   
 
 
   frontend_prod: #integre nginx
     image: radttal/video_frontend:latest
     container_name: projet-frontend-prod
     ports:
-      - "80:80"
+      - "127.0.0.1:80:80"
     networks:
       - app-network
+    environment:
+      - VIRTUAL_HOST=localhost
     depends_on:
       - backend_test #je laisse 'test' pour le default.conf de nginx , sinon c'est bien la version test
 
@@ -57,4 +69,4 @@ networks:
 
 
 volumes: #pour la persistance
-  videos_volume:
+  videos_volume_prod:
