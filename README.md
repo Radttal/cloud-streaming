@@ -101,7 +101,7 @@ Ces scripts simplifient les étapes de gestion des environnements de développem
   docker-compose -f docker-compose-test.yml up --build
   ```
 - Ajoutez des vidéos via l’interface web, arrêtez les services avec `script_stop.sh`, puis relancez avec `script_dev.sh`. La persistance des vidéos est garantie.
-- Accédez à l'application sur [http://localhost:8080](http://localhost:8080).
+- Accédez à l'application sur [http://localhost](http://localhost).
 
 ### Mode production
 
@@ -113,12 +113,20 @@ Ces scripts simplifient les étapes de gestion des environnements de développem
 
 ## 6. Monitoring avec Prometheus
 
-- Accédez à l’interface de Prometheus sur [http://localhost:9090](http://localhost:9090) pour visualiser les métriques des conteneurs.
+- Accédez à l’interface de Prometheus sur [http://localhost:9090](http://localhost:9090) pour visualiser les métriques des conteneurs. Dans l'onglet graph ,executer par exemple
 
 
+    ```bash
+      - process_cpu_seconds_total 
+    ```
+
+    ou
 
 
-
+     ```bash
+       - sum by (instance) (process_cpu_seconds_total)
+     ```
+      
 
 
 ## 7. Intégration Kubernetes
